@@ -153,7 +153,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     ): cv.positive_int,
                     vol.Optional(
                         CONF_FILTER_TYPE, default=old_filter_types
-                    ): cv.multi_select(["Bus", "Straßenbahn"]),
+                    ): cv.multi_select(
+                        [
+                            "Straßenbahn",
+                            "Bus",
+                            "Regionalbus",
+                            "Nachtbus",
+                            "Ersatzverkehr",
+                            "S-Bahn",
+                            "U-Bahn",
+                        ]
+                    ),
                     vol.Optional(
                         CONF_FILTER_NUM,
                         default=self.config_entry.options.get(CONF_FILTER_NUM, "*"),
