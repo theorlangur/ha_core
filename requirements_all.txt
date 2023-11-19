@@ -265,6 +265,9 @@ aiohttp-fast-url-dispatcher==0.1.0
 # homeassistant.components.http
 aiohttp-zlib-ng==0.1.1
 
+# homeassistant.components.vvm_public_transport
+aiohttp==3.8.5
+
 # homeassistant.components.emulated_hue
 # homeassistant.components.http
 aiohttp_cors==0.7.0

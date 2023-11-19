@@ -1,0 +1,13 @@
+{
+  "domain": "vvm_public_transport",
+  "name": "VVM Transport",
+  "codeowners": ["@theorlangur"],
+  "config_flow": false,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/vvm_public_transport",
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "requirements": ["aiohttp==3.8.5"],
+  "ssdp": [],
+  "zeroconf": []
+}
