@@ -531,6 +531,7 @@ FLOWS = {
         "volumio",
         "volvooncall",
         "vulcan",
+        "vvm_public_transport",
         "wallbox",
         "waqi",
         "watttime",

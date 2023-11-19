@@ -22,6 +22,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
             VVMStopDepartureNearest(coordinator),
             VVMStopDepartureNearestLeft(coordinator),
             VVMStopDepartureNearestDelay(coordinator),
+            VVMStopDepartureNearestVehicleType(coordinator),
+            VVMStopDepartureNearestVehicleNum(coordinator),
         ]
     )
 
@@ -55,7 +57,7 @@ class VVMStopDepartureNearest(VVMStopSensorEntityBase):
 
     def __init__(self, coordinator: DataUpdateCoordinator[VVMStopMonitorHA]) -> None:
         """Construct the nearest sensor."""
-        super().__init__(coordinator, "Nearest Summary")
+        super().__init__(coordinator, "Summary")
         self.extra = {
             "departures": self.coordinator.data.departures,
             "last_updated": self.coordinator.data.last_updated,
@@ -64,6 +66,8 @@ class VVMStopDepartureNearest(VVMStopSensorEntityBase):
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the device."""
+        self.extra["departures"] = self.coordinator.data.departures
+        self.extra["last_updated"] = self.coordinator.data.last_updated
         return self.extra
 
     @property
@@ -77,7 +81,7 @@ class VVMStopDepartureNearestLeft(VVMStopSensorEntityBase):
 
     def __init__(self, coordinator: DataUpdateCoordinator[VVMStopMonitorHA]) -> None:
         """Construct the Nearest Left sensor."""
-        super().__init__(coordinator, "Nearest Left")
+        super().__init__(coordinator, "Time Left")
 
     @property
     def native_value(self):
@@ -90,9 +94,35 @@ class VVMStopDepartureNearestDelay(VVMStopSensorEntityBase):
 
     def __init__(self, coordinator: DataUpdateCoordinator[VVMStopMonitorHA]) -> None:
         """Construct the Nearest Delay sensor."""
-        super().__init__(coordinator, "Nearest Delay")
+        super().__init__(coordinator, "Delay")
 
     @property
     def native_value(self):
         """Return the state of the sensor."""
         return self.coordinator.data.nearest_delay_minutes
+
+
+class VVMStopDepartureNearestVehicleType(VVMStopSensorEntityBase):
+    """Sensor for a vehicle type for the soonest one."""
+
+    def __init__(self, coordinator: DataUpdateCoordinator[VVMStopMonitorHA]) -> None:
+        """Construct the Nearest Vehicle Type sensor."""
+        super().__init__(coordinator, "Vehicle Type")
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.coordinator.data.nearest_vehicle_type
+
+
+class VVMStopDepartureNearestVehicleNum(VVMStopSensorEntityBase):
+    """Sensor for a vehicle number for the soonest one."""
+
+    def __init__(self, coordinator: DataUpdateCoordinator[VVMStopMonitorHA]) -> None:
+        """Construct the Nearest Vehicle Number sensor."""
+        super().__init__(coordinator, "Vehicle Number")
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        return self.coordinator.data.nearest_vehicle_num

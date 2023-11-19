@@ -122,31 +122,116 @@ class VVMStopMonitorHA:
 
     api: VVMStopMonitor
     timespan: int
-    direction: str
     departures: list[dict]
     last_updated: datetime
     nearest_summary: str
     nearest_left_minutes: int
     nearest_delay_minutes: int
+    nearest_vehicle_type: str
+    nearest_vehicle_num: str
+    _filters: dict
 
-    def __init__(self, stop_id, timespan=30, direction=""):
+    def __init__(self, stop_id, timespan=30):
         """Construct VVMStopMonitorHA instance."""
         self.api = VVMStopMonitor(stop_id)
         self.timespan = timespan
-        self.direction = direction
+        self._filters = {}
+
+    def filter_departure_in(self, d):
+        """Filter departure in if it fits."""
+        if "types" in self._filters and len(self._filters["types"]) > 0:
+            if len([t for t in self._filters["types"] if t == d["type"]]) == 0:
+                return False
+        if "numbers" in self._filters and len(self._filters["numbers"]) > 0:
+            if len([t for t in self._filters["numbers"] if t == d["num"]]) == 0:
+                return False
+        if "direction" in self._filters and len(self._filters["direction"]) > 0:
+            if (
+                len(
+                    [
+                        t
+                        for t in self._filters["direction"]
+                        if d["to"].lower().find(t.lower()) != -1
+                    ]
+                )
+                == 0
+            ):
+                return False
+
+        return True
 
     async def async_update(self):
         """Update departures async."""
-        self.departures = await self.api.get_stop_departures(self.timespan)
+        deps = await self.api.get_stop_departures(self.timespan)
+        self.departures = [d for d in deps if self.filter_departure_in(d)]
         self.last_updated = datetime.now()
-        closest = self.departures[0]
-        self.nearest_summary = "({:d} min) {} {} ({})".format(
-            closest["left"], closest["type"], closest["num"], closest["to"]
-        )
-        self.nearest_left_minutes = closest["left"]
-        self.nearest_delay_minutes = closest["delay"]
+        if len(self.departures) > 0:
+            closest = self.departures[0]
+            self.nearest_summary = "({:d} min) {} {} ({})".format(
+                closest["left"], closest["type"], closest["num"], closest["to"]
+            )
+            self.nearest_left_minutes = closest["left"]
+            self.nearest_delay_minutes = closest["delay"]
+            self.nearest_vehicle_type = closest["type"]
+            self.nearest_vehicle_num = closest["num"]
+        else:
+            self.nearest_summary = "Unknown"
+            self.nearest_left_minutes = 0
+            self.nearest_delay_minutes = 0
+            self.nearest_vehicle_type = "Unknown"
+            self.nearest_vehicle_num = "Unknown"
 
     @property
     def stop_id(self):
         """Access stop id as a property."""
         return self.api.stop_id
+
+    @property
+    def filter_types(self):
+        """Access filter types if they exist."""
+        if "types" in self._filters:
+            return self._filters["types"]
+        return None
+
+    @filter_types.setter
+    def filter_types(self, types):
+        """Set filter types."""
+        self._filters["types"] = types
+
+    @property
+    def filter_nums(self):
+        """Access filter numbers if they exist."""
+        if "numbers" in self._filters:
+            return self._filters["numbers"]
+        return None
+
+    @filter_nums.setter
+    def filter_nums(self, v):
+        """Set filter numbers."""
+        if isinstance(v, str):
+            v = v.strip()
+            if v != "*":
+                self._filters["numbers"] = [x.strip() for x in v.split(",")]
+            else:
+                self._filters["numbers"] = []
+        else:
+            self._filters["numbers"] = v
+
+    @property
+    def filter_direction(self):
+        """Access filter direction if it exist."""
+        if "direction" in self._filters:
+            return self._filters["direction"]
+        return None
+
+    @filter_direction.setter
+    def filter_direction(self, d):
+        """Set filter direction."""
+        if isinstance(d, str):
+            d = d.strip()
+            if d != "*":
+                self._filters["direction"] = [x.strip() for x in d.split(";")]
+            else:
+                self._filters["direction"] = []
+        else:
+            self._filters["direction"] = d

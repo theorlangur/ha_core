@@ -9,7 +9,14 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import CONF_DIRECTION, CONF_STOP_ID, CONF_TIMEFRAME, DOMAIN
+from .const import (
+    CONF_FILTER_DIRECTION,
+    CONF_FILTER_NUM,
+    CONF_FILTER_TYPE,
+    CONF_STOP_ID,
+    CONF_TIMEFRAME,
+    DOMAIN,
+)
 from .vvm_access import VVMStopMonitorHA
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
@@ -19,9 +26,15 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up vvm_transport from a config entry."""
-    api = VVMStopMonitorHA(
-        entry.data[CONF_STOP_ID], entry.data[CONF_TIMEFRAME], entry.data[CONF_DIRECTION]
-    )
+    api = VVMStopMonitorHA(entry.data[CONF_STOP_ID], entry.data[CONF_TIMEFRAME])
+
+    if entry.options is not None:
+        if CONF_FILTER_TYPE in entry.options:
+            api.filter_types = entry.options[CONF_FILTER_TYPE]
+        if CONF_FILTER_NUM in entry.options:
+            api.filter_nums = entry.options[CONF_FILTER_NUM]
+        if CONF_FILTER_DIRECTION in entry.options:
+            api.filter_direction = entry.options[CONF_FILTER_DIRECTION]
 
     async def async_update_data() -> VVMStopMonitorHA:
         """Fetch data from the API."""

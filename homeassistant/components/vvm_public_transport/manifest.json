@@ -2,7 +2,7 @@
   "domain": "vvm_public_transport",
   "name": "VVM Transport",
   "codeowners": ["@theorlangur"],
-  "config_flow": false,
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://www.home-assistant.io/integrations/vvm_public_transport",
   "homekit": {},
