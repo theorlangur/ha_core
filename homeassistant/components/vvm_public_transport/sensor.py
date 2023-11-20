@@ -1,17 +1,11 @@
 """VVM Stop departure monitor as a sensor."""
-import logging
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-)
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN
+from .coordinator_base import VVMStopCoordinatorEntityBase
 from .vvm_access import VVMStopMonitorHA
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -28,28 +22,14 @@ async def async_setup_entry(hass, entry, async_add_entities):
     )
 
 
-class VVMStopSensorEntityBase(
-    CoordinatorEntity[DataUpdateCoordinator[VVMStopMonitorHA]], SensorEntity
-):
+class VVMStopSensorEntityBase(VVMStopCoordinatorEntityBase, SensorEntity):
     """Base functionality for all VVM sensors."""
 
     _attr_has_entity_name = True
 
     def __init__(self, coordinator, sensor_id) -> None:
-        """Construct the base class."""
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}_{coordinator.data.stop_id}_{sensor_id}"
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, coordinator.data.stop_id)},
-            name="VVM Public Transport Stop",
-            manufacturer="VVM",
-        )
-        self._name = sensor_id
-
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return self._name
+        """Construct the base sensor class."""
+        super().__init__(coordinator, "sensor", sensor_id)
 
 
 class VVMStopDepartureNearest(VVMStopSensorEntityBase):

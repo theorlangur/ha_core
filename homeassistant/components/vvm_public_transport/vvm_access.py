@@ -189,9 +189,9 @@ class VVMStopMonitorHA:
     @property
     def filter_types(self):
         """Access filter types if they exist."""
-        if "types" in self._filters:
-            return self._filters["types"]
-        return None
+        if "types" not in self._filters:
+            self._filters["types"] = []
+        return self._filters["types"]
 
     @filter_types.setter
     def filter_types(self, types):
@@ -201,9 +201,9 @@ class VVMStopMonitorHA:
     @property
     def filter_nums(self):
         """Access filter numbers if they exist."""
-        if "numbers" in self._filters:
-            return self._filters["numbers"]
-        return None
+        if "numbers" not in self._filters:
+            self._filters["numbers"] = []
+        return self._filters["numbers"]
 
     @filter_nums.setter
     def filter_nums(self, v):
@@ -220,9 +220,9 @@ class VVMStopMonitorHA:
     @property
     def filter_direction(self):
         """Access filter direction if it exist."""
-        if "direction" in self._filters:
-            return self._filters["direction"]
-        return None
+        if "direction" not in self._filters:
+            self._filters["direction"] = []
+        return self._filters["direction"]
 
     @filter_direction.setter
     def filter_direction(self, d):
