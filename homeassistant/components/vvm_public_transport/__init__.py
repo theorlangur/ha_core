@@ -19,9 +19,9 @@ from .const import (
 )
 from .vvm_access import VVMStopMonitorHA
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH]
-
 _LOGGER = logging.getLogger(__name__)
+
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.TEXT]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

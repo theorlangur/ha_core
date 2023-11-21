@@ -143,7 +143,16 @@ class VVMStopMonitorHA:
             if len([t for t in self._filters["types"] if t == d["type"]]) == 0:
                 return False
         if "numbers" in self._filters and len(self._filters["numbers"]) > 0:
-            if len([t for t in self._filters["numbers"] if t == d["num"]]) == 0:
+            if (
+                len(
+                    [
+                        t
+                        for t in self._filters["numbers"]
+                        if t.strip().lower() == d["num"].lower()
+                    ]
+                )
+                == 0
+            ):
                 return False
         if "direction" in self._filters and len(self._filters["direction"]) > 0:
             if (
@@ -210,8 +219,8 @@ class VVMStopMonitorHA:
         """Set filter numbers."""
         if isinstance(v, str):
             v = v.strip()
-            if v != "*":
-                self._filters["numbers"] = [x.strip() for x in v.split(",")]
+            if v not in ("*", ""):
+                self._filters["numbers"] = [x.lower().strip() for x in v.split(",")]
             else:
                 self._filters["numbers"] = []
         else:
@@ -229,8 +238,8 @@ class VVMStopMonitorHA:
         """Set filter direction."""
         if isinstance(d, str):
             d = d.strip()
-            if d != "*":
-                self._filters["direction"] = [x.strip() for x in d.split(";")]
+            if d not in ("*", ""):
+                self._filters["direction"] = [x.lower().strip() for x in d.split(",")]
             else:
                 self._filters["direction"] = []
         else:
