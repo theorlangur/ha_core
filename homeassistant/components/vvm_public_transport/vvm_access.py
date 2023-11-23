@@ -43,6 +43,49 @@ class VVMAccessApi:
                     result.append(i)
         return result
 
+    @staticmethod
+    def try_find_name(p):
+        """Try finding the name among the attributes."""
+        if "attrs" in p:
+            for x in p["attrs"]:
+                if x["name"] == "STOP_NAME_WITH_PLACE":
+                    return x["value"]
+        return None
+
+    @staticmethod
+    async def get_stops_nearby(lat, lon, radius=500):
+        """Obtain list of stops based on the passed coordinates and radius."""
+        # https://mobile.defas-fgi.de/vvmapp/XML_COORD_REQUEST?
+        # coord=9.913781952051163:49.79625562837197:WGS84[DD.ddddd]&max=10&inclFilter=1&radius_1=500
+        # &type_1=STOP&stateless=1&language=en&outputFormat=XML&coordOutputFormat=WGS84[DD.ddddd]&coordOutputFormatTail=7
+        base_url = "https://mobile.defas-fgi.de/vvmapp/XML_COORD_REQUEST"
+        params = {
+            "coord": f"{lon}:{lat}:WGS84[DD.ddddd]",
+            "max": "10",
+            "inclFilter": "1",
+            "radius_1": f"{radius}",
+            "type_1": "STOP",
+            "stateless": "1",
+            "language": "en",
+            "coordOutputFormat": "WGS84[DD.ddddd]",
+            "coordOutputFormatTail": "7",
+            "outputFormat": "json",
+        }
+
+        data = await VVMAccessApi.fetch_data(base_url, params)
+        result = []
+        if data and "pins" in data:
+            points = data["pins"]
+            for p in points:
+                if p["type"] == "STOP":
+                    i = {}
+                    i["id"] = p["id"]
+                    i["name"] = VVMAccessApi.try_find_name(p)
+                    if i["name"] is None:
+                        i["name"] = p["desc"]
+                    result.append(i)
+        return result
+
 
 class VVMStopMonitor:
     """VVM stop monitoring class."""
