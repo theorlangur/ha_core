@@ -61,7 +61,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Show menu to choose discovery based on location or name search."""
         menu_options = {
             "manual_search": "Search by name",
-            "nearby_select": "Nearby",
+            "nearby_select": "Near home",
         }
         return self.async_show_menu(step_id="user", menu_options=menu_options)
 
