@@ -156,6 +156,24 @@ class VVMStopMonitor:
                     i["num"] = d["servingLine"]["number"]
                     i["to"] = d["servingLine"]["direction"]
                     i["from"] = d["servingLine"]["directionFrom"]
+                    dt = d["realDateTime"]
+                    i["real_time"] = datetime(
+                        int(dt["year"]),
+                        int(dt["month"]),
+                        int(dt["day"]),
+                        int(dt["hour"]),
+                        int(dt["minute"]),
+                    )
+                    i["real_time_simple"] = dt["hour"] + ":" + dt["minute"]
+                    dt = d["dateTime"]
+                    i["should_time"] = datetime(
+                        int(dt["year"]),
+                        int(dt["month"]),
+                        int(dt["day"]),
+                        int(dt["hour"]),
+                        int(dt["minute"]),
+                    )
+                    i["should_time_simple"] = dt["hour"] + ":" + dt["minute"]
                     result.append(i)
         return result
 
@@ -173,12 +191,14 @@ class VVMStopMonitorHA:
     nearest_vehicle_type: str
     nearest_vehicle_num: str
     _filters: dict
+    _stop_name: str
 
-    def __init__(self, stop_id, timespan=30):
+    def __init__(self, stop_id, stop_name, timespan=30):
         """Construct VVMStopMonitorHA instance."""
         self.api = VVMStopMonitor(stop_id)
         self.timespan = timespan
         self._filters = {}
+        self._stop_name = stop_name
 
     def filter_departure_in(self, d):
         """Filter departure in if it fits."""
@@ -232,6 +252,11 @@ class VVMStopMonitorHA:
             self.nearest_delay_minutes = 0
             self.nearest_vehicle_type = "Unknown"
             self.nearest_vehicle_num = "Unknown"
+
+    @property
+    def stop_name(self):
+        """Access stop name as a property."""
+        return self._stop_name
 
     @property
     def stop_id(self):

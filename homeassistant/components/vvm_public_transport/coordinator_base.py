@@ -25,10 +25,10 @@ class VVMStopCoordinatorEntityBase(
         )
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, coordinator.data.stop_id)},
-            name="VVM Public Transport Stop",
+            name="VVM Stop",
             manufacturer="VVM",
         )
-        self._name = entity_id
+        self._name = f"{coordinator.data.stop_name} {entity_id}"
 
     @property
     def name(self):

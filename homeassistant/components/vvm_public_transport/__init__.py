@@ -26,7 +26,9 @@ PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.TEXT]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up vvm_transport from a config entry."""
-    api = VVMStopMonitorHA(entry.data[CONF_STOP_ID], entry.data[CONF_TIMEFRAME])
+    api = VVMStopMonitorHA(
+        entry.data[CONF_STOP_ID], entry.title, entry.data[CONF_TIMEFRAME]
+    )
 
     if entry.options is not None:
         if CONF_FILTER_TYPE in entry.options:
