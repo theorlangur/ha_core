@@ -36,7 +36,12 @@ class VVMAccessApi:
         if data:
             points = data["stopFinder"]["points"]
             for p in points:
-                if p["type"] == "any" and p["anyType"] == "stop":
+                if (
+                    p["type"] == "any"
+                    and p["anyType"] == "stop"
+                    and "name" in p
+                    and "stateless" in p
+                ):
                     i = {}
                     i["name"] = p["name"]
                     i["id"] = p["stateless"]
@@ -77,12 +82,14 @@ class VVMAccessApi:
         if data and "pins" in data:
             points = data["pins"]
             for p in points:
-                if p["type"] == "STOP":
+                if p["type"] == "STOP" and "id" in p:
                     i = {}
                     i["id"] = p["id"]
                     i["name"] = VVMAccessApi.try_find_name(p)
-                    if i["name"] is None:
+                    if i["name"] is None and "desc" in p:
                         i["name"] = p["desc"]
+                    else:
+                        i["name"] = "Unknown Stop Name"
                     result.append(i)
         return result
 
@@ -123,9 +130,9 @@ class VVMStopMonitor:
             if data["departureList"]:
                 stop_name = None
                 if (
-                    data["dm"]
-                    and data["dm"]["points"]
-                    and data["dm"]["points"]["point"]
+                    "dm" in data
+                    and "points" in data["dm"]
+                    and "point" in data["dm"]["points"]
                 ):
                     stop_name = data["dm"]["points"]["point"]["name"]
                 return (True, stop_name)
@@ -147,11 +154,16 @@ class VVMStopMonitor:
         if data:
             deps = data["departureList"]
             for d in deps:
+                if "servingLine" not in d:
+                    continue
                 countdown = int(d["countdown"])
                 if countdown < timespan:
                     i = {}
                     i["left"] = countdown
-                    i["delay"] = int(d["servingLine"]["delay"])
+                    if "delay" in d["servingLine"]:
+                        i["delay"] = int(d["servingLine"]["delay"])
+                    else:
+                        i["delay"] = 0
                     i["type"] = d["servingLine"]["name"]
                     i["num"] = d["servingLine"]["number"]
                     i["to"] = d["servingLine"]["direction"]
