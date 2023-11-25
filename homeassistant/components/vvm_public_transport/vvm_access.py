@@ -176,7 +176,13 @@ class VVMStopMonitor:
                         int(dt["hour"]),
                         int(dt["minute"]),
                     )
-                    i["real_time_simple"] = dt["hour"] + ":" + dt["minute"]
+                    h = dt["hour"]
+                    if len(h) == 1:
+                        h = "0" + h
+                    m = dt["minute"]
+                    if len(m) == 1:
+                        m = "0" + m
+                    i["real_time_simple"] = h + ":" + m
                     dt = d["dateTime"]
                     i["should_time"] = datetime(
                         int(dt["year"]),
@@ -185,7 +191,13 @@ class VVMStopMonitor:
                         int(dt["hour"]),
                         int(dt["minute"]),
                     )
-                    i["should_time_simple"] = dt["hour"] + ":" + dt["minute"]
+                    h = dt["hour"]
+                    if len(h) == 1:
+                        h = "0" + h
+                    m = dt["minute"]
+                    if len(m) == 1:
+                        m = "0" + m
+                    i["should_time_simple"] = h + ":" + m
                     result.append(i)
         return result
 
